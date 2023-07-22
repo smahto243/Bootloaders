@@ -5,7 +5,7 @@
  */
 
 /* #define	DEBUG	*/
-
+#define	DEBUG 1
 #include <common.h>
 #include <autoboot.h>
 #include <cli.h>

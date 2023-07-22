@@ -14,13 +14,14 @@
 #include <post.h>
 #include <u-boot/sha256.h>
 #include <bootcount.h>
+#include <../board/ti/am335x/board.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
 #define MAX_DELAY_STOP_STR 32
 
 #ifndef DEBUG_BOOTKEYS
-#define DEBUG_BOOTKEYS 0
+#define DEBUG_BOOTKEYS 1
 #endif
 #define debug_bootkeys(fmt, args...)		\
 	debug_cond(DEBUG_BOOTKEYS, fmt, ##args)
@@ -50,6 +51,7 @@ static int slow_equals(u8 *a, u8 *b, int len)
 
 static int passwd_abort(uint64_t etime)
 {
+        debug_bootkeys("passwd_abort 1######\n");
 	const char *sha_env_str = env_get("bootstopkeysha256");
 	u8 sha_env[SHA256_SUM_LEN];
 	u8 sha[SHA256_SUM_LEN];
@@ -102,6 +104,7 @@ static int passwd_abort(uint64_t etime)
 #else
 static int passwd_abort(uint64_t etime)
 {
+        debug_bootkeys("passwd_abort 2###############\n");
 	int abort = 0;
 	struct {
 		char *str;
@@ -168,7 +171,8 @@ static int passwd_abort(uint64_t etime)
 
 				/* don't retry auto boot */
 				if (!delaykey[i].retry)
-					bootretry_dont_retry();
+					//bootretry_dont_retry();
+					hello();
 				abort = 1;
 			}
 		}
@@ -203,8 +207,8 @@ static int __abortboot(int bootdelay)
 }
 
 # else	/* !defined(CONFIG_AUTOBOOT_KEYED) */
-
-#ifdef CONFIG_MENUKEY
+#define CONFIG_MENUPROMPT 1
+#ifdef CONFIG_MENUKEY 1
 static int menukey;
 #endif
 
@@ -215,6 +219,7 @@ static int __abortboot(int bootdelay)
 
 #ifdef CONFIG_MENUPROMPT
 	printf(CONFIG_MENUPROMPT);
+    printf("Hit any key Sairam : %2d ", bootdelay);
 #else
 	printf("Hit any key to stop autoboot: %2d ", bootdelay);
 #endif
@@ -259,8 +264,10 @@ static int abortboot(int bootdelay)
 {
 	int abort = 0;
 
-	if (bootdelay >= 0)
+	if (bootdelay >= 0) {
+	        //hello();
 		abort = __abortboot(bootdelay);
+		}
 
 #ifdef CONFIG_SILENT_CONSOLE
 	if (abort)
@@ -327,22 +334,26 @@ const char *bootdelay_process(void)
 
 void autoboot_command(const char *s)
 {
-	debug("### main_loop: bootcmd=\"%s\"\n", s ? s : "<UNDEFINED>");
 
+	debug("### main_loop: bootcmd=\"%s\"\n", s ? s : "<UNDEFINED>");
+    printf("Santosh 1 %%%%%%%%%\n");
 	if (stored_bootdelay != -1 && s && !abortboot(stored_bootdelay)) {
 #if defined(CONFIG_AUTOBOOT_KEYED) && !defined(CONFIG_AUTOBOOT_KEYED_CTRLC)
+                printf("Santosh 2 %%%%%%%%%\n");
 		int prev = disable_ctrlc(1);	/* disable Control C checking */
 #endif
-
+                printf("Santosh 3 %%%%%%%%%\n");
 		run_command_list(s, -1, 0);
 
 #if defined(CONFIG_AUTOBOOT_KEYED) && !defined(CONFIG_AUTOBOOT_KEYED_CTRLC)
+                printf("Santosh 4 %%%%%%%%%\n");
 		disable_ctrlc(prev);	/* restore Control C checking */
 #endif
 	}
 
 #ifdef CONFIG_MENUKEY
 	if (menukey == CONFIG_MENUKEY) {
+	        rintf("Santosh 5 %%%%%%%%%\n");
 		s = env_get("menucmd");
 		if (s)
 			run_command_list(s, -1, 0);

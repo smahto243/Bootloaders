@@ -1170,3 +1170,51 @@ U_BOOT_DEVICE(am335x_mmc1) = {
 	.platdata = &am335x_mmc1_platdata,
 };
 #endif
+
+
+#if !defined(CONFIG_SPL_BUILD)
+#include<stdio.h>
+void hello(void)
+{
+    // Choice variable
+    int choice = -1;
+    char buffer[CONFIG_SYS_CBSIZE];
+    // Menu display
+    printf("MENU:\n0 Stay in Boot Mode\n1. Boot From Second Partition\n2. Boot From Ram Disk\n3. Boot Using Nfs\n4. Boot From Third Partition");
+        // Infinite Loop for choice input
+    while(1){
+        printf("\nEnter your choice:");
+     // cli_readline_into_buffer("edit: ", buffer, 0);
+        int b = getc();//serial_getc() ;
+        if(b - '0' == 0){
+            printf("> Boot Mode!\n");
+            run_command("boot", 0);
+            break;
+        }
+        else if (b - '0' == 1){
+            printf("> Second Partition!\n");
+          //  Add your command
+            break;
+        }
+        else if (b - '0' == 2){
+            printf("Ram Disk!\n");
+            //  Add your command
+            break;
+        }
+        else if (b - '0' == 3){
+            printf(" Nfs!\n");
+            //  Add your command
+            break;
+        }
+        else if (b - '0' == 4){
+            printf(" Third Partition!\n");
+            //  Add your command
+            break;
+        }
+        else{
+            printf("> Invalid Input\n");
+        }
+    }
+
+}
+#endif
